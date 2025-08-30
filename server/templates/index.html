@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ .title }}</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+  <style>
+    /* a couple of helpers for the frame */
+    .chart-frame {
+      width: 100%;
+      height: 600px;
+      border: 0;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 6px 22px rgba(0,0,0,.10);
+    }
+    .picker { display:flex; gap:8px; flex-wrap:wrap; margin: 12px 0 18px; }
+    .picker input, .picker select, .picker button {
+      padding:10px 12px; border-radius:10px; border:1px solid #e5e7eb; font-weight:600;
+    }
+    .picker button { cursor:pointer; background:#c9ffd8; border-color:#a7f4bd; }
+  </style>
+</head>
+<body class="page">
+
+  <div class="announce">
+    📈 Intraday demo using Yahoo Finance + go-echarts (unofficial API).
+  </div>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="logo">
+        <span class="logo-dot">··</span>
+        <span class="logo-text">Gin<span class="logo-x">×</span>htmx</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main">
+    <section class="hero-card">
+      <div class="hero-copy">
+        <h1 class="hero-title">Live <span class="accent">Intraday</span> Chart</h1>
+        <p class="hero-sub">Pick a ticker and range; the chart below updates instantly.</p>
+
+        <form class="picker"
+              hx-get="/frame"
+              hx-target="#frame-holder"
+              hx-swap="innerHTML">
+          <input type="text" name="symbol" value="{{ .symbol }}" placeholder="Ticker (e.g., AAPL, MSFT, TSLA)" />
+          <select name="range">
+            <option value="1d"  {{if eq .range "1d"}}selected{{end}}>1d</option>
+            <option value="5d"  {{if eq .range "5d"}}selected{{end}}>5d</option>
+            <option value="1mo" {{if eq .range "1mo"}}selected{{end}}>1mo</option>
+          </select>
+          <select name="interval">
+            <option value="1m"  {{if eq .interval "1m"}}selected{{end}}>1m</option>
+            <option value="5m"  {{if eq .interval "5m"}}selected{{end}}>5m</option>
+            <option value="15m" {{if eq .interval "15m"}}selected{{end}}>15m</option>
+          </select>
+          <button type="submit">Update</button>
+        </form>
+      </div>
+
+      <div class="hero-art">
+        <div class="stack"><div class="plate eyes"></div><div class="plate"></div><div class="plate"></div><div class="plate"></div><div class="base"></div></div>
+      </div>
+
+      <div class="hero-shadow"></div>
+    </section>
+
+    <section id="frame-holder" class="card">
+      <!-- default frame on first load -->
+      <iframe class="chart-frame"
+              src="/chart?symbol={{ .symbol }}&range={{ .range }}&interval={{ .interval }}"
+              loading="lazy"></iframe>
+    </section>
+  </main>
+
+</body>
+</html>
