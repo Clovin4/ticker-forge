@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strings"
 
 	"ticker-forge/internal/chart"
 
@@ -26,35 +27,58 @@ func Frame() gin.HandlerFunc {
 		symbol := orDefault(c.Query("symbol"), "", "AAPL")
 		rng := orDefault(c.Query("range"), "", "1d")
 		interval := orDefault(c.Query("interval"), "", "1m")
+		view := orDefault(c.Query("view"), "", "candles")
+
 		html := fmt.Sprintf(
-			`<iframe class="chart-frame" src="/chart?symbol=%s&range=%s&interval=%s" loading="lazy"></iframe>`,
+			`<iframe class="chart-frame" src="/chart?symbol=%s&range=%s&interval=%s&view=%s" loading="lazy"></iframe>`,
 			template.URLQueryEscaper(symbol),
 			template.URLQueryEscaper(rng),
 			template.URLQueryEscaper(interval),
+			template.URLQueryEscaper(view),
 		)
 		c.Header("Content-Type", "text/html; charset=utf-8")
 		c.String(http.StatusOK, html)
 	}
 }
 
+// GET /chart?symbol=MSFT&range=1d&interval=1m&view=candles|line
 func Chart() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		symbol := orDefault(c.Query("symbol"), "", "AAPL")
 		rng := orDefault(c.Query("range"), "", "1d")
 		interval := orDefault(c.Query("interval"), "", "1m")
+		view := strings.ToLower(orDefault(c.Query("view"), "", "candles"))
 
-		times, closes, err := chart.FetchIntraday(symbol, rng, interval)
-		if err != nil {
-			c.String(http.StatusBadRequest, "error: %v", err)
+		switch view {
+		case "line":
+			times, closes, err := chart.FetchIntraday(symbol, rng, interval)
+			if err != nil {
+				c.String(http.StatusBadRequest, "error: %v", err)
+				return
+			}
+			page, err := chart.RenderLinePage(symbol, times, closes)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "render error: %v", err)
+				return
+			}
+			c.Header("Content-Type", "text/html; charset=utf-8")
+			c.Writer.Write(page)
 			return
+
+		default: // "candles"
+			ticks, err := chart.FetchIntradayOHLC(symbol, rng, interval)
+			if err != nil {
+				c.String(http.StatusBadRequest, "error: %v", err)
+				return
+			}
+			page, err := chart.RenderKlinePage(symbol, ticks)
+			if err != nil {
+				c.String(http.StatusInternalServerError, "render error: %v", err)
+				return
+			}
+			c.Header("Content-Type", "text/html; charset=utf-8")
+			c.Writer.Write(page)
 		}
-		page, err := chart.RenderLinePage(symbol, times, closes)
-		if err != nil {
-			c.String(http.StatusInternalServerError, "render error: %v", err)
-			return
-		}
-		c.Header("Content-Type", "text/html; charset=utf-8")
-		c.Writer.Write(page)
 	}
 }
 

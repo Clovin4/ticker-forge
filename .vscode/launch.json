@@ -1,0 +1,64 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        // Run the current package (main) with args for server
+        {
+            "name": "Launch: cmd/ticker-forge",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/cmd/ticker-forge",
+            "args": [
+                "--mode",
+                "serve",
+                "--port",
+                "8080",
+                "--symbol",
+                "MSFT"
+            ],
+            "env": {
+                "GIN_MODE": "debug"
+            }
+        },
+        // Run the current package (main) without args
+        {
+            "name": "Launch: cmd/ticker-forge (no args)",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/cmd/ticker-forge"
+        },
+        // Debug the currently open file (handy for quick scripts)
+        {
+            "name": "Launch: current file",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${fileDirname}"
+        },
+        // Attach to a running process (local)
+        {
+            "name": "Attach: local process",
+            "type": "go",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        },
+        // Remote debugging (delve headless server)
+        {
+            "name": "Attach: remote delve",
+            "type": "go",
+            "request": "attach",
+            "mode": "remote",
+            "port": 2345,
+            "host": "127.0.0.1"
+        },
+        // Run & debug tests in package
+        {
+            "name": "Test: package",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}"
+        }
+    ]
+}
