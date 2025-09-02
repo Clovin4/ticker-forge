@@ -1,0 +1,55 @@
+site_name: Tickity
+site_description: A Go-based CLI/TUI + webserver for efficient market analytics
+site_url: https://example.com
+repo_name: clovin4/tickity
+repo_url: https://github.com/clovin4/tickity
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - toc.follow
+    - toc.integrate
+    - content.code.copy
+    - content.tabs.link
+    - search.highlight
+    - search.suggest
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Overview: index.md
+  - Getting Started: getting-started.md
+  - Usage:
+      - CLI: usage/cli.md
+      - TUI: usage/tui.md
+  - Configuration: configuration.md
+  - Development Plan: development-plan.md
+  - API Reference: reference/README.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.critic
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/clovin4/tickity
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/christian-loving/
